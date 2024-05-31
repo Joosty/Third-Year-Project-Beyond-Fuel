@@ -1,0 +1,75 @@
+import numpy as np
+import pandas as pd
+from scipy.integrate import solve_ivp
+import matplotlib.pyplot as plt
+import sys
+
+# Constants
+G = 6.67430e-11  # gravitational constant (m^3/kg/s^2)
+M_EARTH = 5.972e24  # mass of the Earth (kg)
+R_EARTH = 6371e3  # radius of the Earth (m)
+Cd = 2.2  # drag coefficient
+surface_area = 36.55  # satellite surface area (m^2)
+mass = 15000  # satellite mass (kg)
+minimum = 150000  # reentry altitude (km)
+
+# Load air density data from CSV file
+density_data = pd.read_csv('alt + density 2022.csv')
+heights = density_data['Altitude'].values * 1e3  # convert km to m
+densities = (density_data['Density'].values * 1e3)
+
+# Interpolate air density as a function of altitude
+density_interp = np.interp
+
+
+def density_interpolator(h):
+    return np.interp(h, heights, densities)
+
+
+# Effective area and drag constant
+A_eff = Cd * surface_area
+k = (((G * M_EARTH) ** 0.5) * A_eff) / mass
+
+# ODE for altitude
+tolerance = 1  # You can adjust the tolerance based on your needs
+
+
+def model(t, h):
+    if h <= minimum:
+        h_dot = 0.0
+
+        if abs(h - minimum) < tolerance:
+            days_taken = t / 86400  # Assuming ’t’ is the time parameter
+            print(f"Altitude dropped below {minimum / 1000} km at t = {days_taken} days.")
+
+        return None
+    else:
+        density = density_interpolator(h)
+        h_dot = -k * density * (R_EARTH + h) ** 0.5
+        return h_dot
+
+
+# Initial conditions
+initial_altitude = float(input("Inital Altitude (km): ")) * 10**3  # initial altitude (m)
+initial_time = 0.0  # initial time (s)
+
+# Time span for integration
+max_time = 60000000000
+steps = 1000
+t_span = (initial_time, max_time)
+t = np.arange(initial_time, max_time, steps)
+
+# Solve the ODE
+solution = solve_ivp(model, t_span, [initial_altitude], method='RK45', t_eval=t,
+                     dense_output=True)
+
+# Extract results
+time_values = solution.t
+altitude_values = solution.y[0]
+
+# Plot the results
+plt.plot(time_values / 86400, altitude_values / 1000)
+plt.xlabel('Time (Days)')
+plt.ylabel('Altitude (km)')
+plt.title('Satellite Orbital Decay')
+plt.show()
