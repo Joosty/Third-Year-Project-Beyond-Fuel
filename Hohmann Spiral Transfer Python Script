@@ -1,0 +1,14 @@
+import math
+
+def delta_v(v1, v2, delta_i):
+    return math.sqrt(v1**2 + v2**2 - 2*v1*v2*math.cos(delta_i))
+
+# Example usage:
+v1 = 7.586285640615977  # initial velocity in km/s
+v2 = 7.689078116344338  # final velocity in km/s
+angle_i = 53  # initial angle in degrees
+angle_f = 70  # final angle in degrees
+delta_i = math.radians(angle_f - angle_i)  # value for delta_i in radians
+
+result = delta_v(v1, v2, delta_i)
+print("Delta -v in km/s is:", result)
