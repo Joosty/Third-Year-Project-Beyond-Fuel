@@ -1,0 +1,41 @@
+import math
+
+# Inputs
+Current_period = 91.8 * 60  # seconds
+mu = 3.986E5  # km**3/s**2
+
+# Determine how far ahead / behind the target is in time
+theta = 110
+time_behind = (110 / 360) * 24 * 3600
+print("Time target is behind is:", time_behind, "seconds")
+
+# Determine the period needed for the new orbit
+# target is behind the chaser so the chaser needs to slow down.
+# This means that we will be expanding our orbit, increasing our SMA, and therefore increasing our period.
+New_period = Current_period + time_behind
+print("New period is:", New_period, "seconds")
+
+# Calculate the SMA of the new orbit
+a_new = (mu * (New_period / (2 * math.pi)) ** 2) ** (1 / 3)
+print("SMA in km is", a_new)
+
+# vis-viva-current
+R_E = 6378  # km
+apo = 362 + R_E
+per = 358 + R_E
+r = apo
+e = 2.97 * 10**-4
+a = per / (1 - e)
+v = (mu * ((2 / r) - (1 / a))) ** 0.5
+print(v, "km/s")
+
+# vis-viva-phasing
+apo = 362 + R_E
+r = apo
+v_phasing = (mu * ((2 / r) - (1 / a_new))) ** 0.5
+print(v_phasing, "km/s")
+
+# Calc delta v
+# Delta v to rejoin orbit is the same as leaving to multiply by 2
+delta_v = 2 * (v_phasing - v)
+print(delta_v, "km/s")
