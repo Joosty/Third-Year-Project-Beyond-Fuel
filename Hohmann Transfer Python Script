@@ -1,0 +1,30 @@
+import math as m
+
+mu = 3.986E5  # km**3/s**2
+R_E = 6378  # km
+
+# Inputs
+alt_initial = float(input("Altitude tolerance (km): "))  # altitude tolerance (km)
+final_alt = float(input("Operational altitude (km): "))  # Operational altitude (km)
+
+# Final orbit
+r_final = final_alt + R_E  # km
+v_final = m.sqrt(mu / r_final)
+print('v_final =', v_final, 'km/s')
+
+# Initial orbit
+r_initial = alt_initial + R_E
+v_initial = m.sqrt(mu / r_initial)
+print('v_initial =', v_initial, 'km/s')
+
+# Transfer orbit
+r_per = r_initial
+r_apo = r_final
+h_t = m.sqrt(2 * mu * r_apo * r_per / (r_apo + r_per))
+v_tper = h_t / r_per
+v_tapo = h_t / r_apo
+print('Perigee and apogee velocity are', v_tper, 'and', v_tapo, 'km/s respectively')
+
+# Delta_v
+Delta_v = abs(v_final - v_tapo) + abs(v_tper - v_initial)
+print('Delta v required is', Delta_v, 'km/s')
